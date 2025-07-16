@@ -1,5 +1,13 @@
 # @higgins-mmt/vite-plugin-i18n-transformer
 
+## 2.1.1
+
+### Patch Changes
+
+- 统一参数
+- Updated dependencies
+  - @higgins-mmt/core@2.1.1
+
 ## 2.1.0
 
 ### Minor Changes

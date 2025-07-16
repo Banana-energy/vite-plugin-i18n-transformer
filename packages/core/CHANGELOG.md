@@ -1,5 +1,11 @@
 # @higgins-mmt/core
 
+## 2.1.1
+
+### Patch Changes
+
+- 统一参数
+
 ## 2.1.0
 
 ### Minor Changes
