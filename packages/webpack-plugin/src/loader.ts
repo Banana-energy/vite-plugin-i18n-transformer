@@ -10,8 +10,9 @@ export default function i18nTransformerLoader(this: LoaderContext<TransformConfi
   const {
     include = [],
     exclude = [],
+    open = true,
   } = options || {}
-  if (!createFilter(include, exclude,)(resourcePath,)) {
+  if (!createFilter(include, exclude,)(resourcePath,) || !open) {
     return code
   }
   const { code: newCode, } = transform({

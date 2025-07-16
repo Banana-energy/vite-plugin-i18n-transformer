@@ -1,4 +1,4 @@
-import type { GenerateConfig, UploadConfig, } from '@higgins-mmt/core'
+import type { I18nPluginOptions, UploadConfig, } from '@higgins-mmt/core'
 import type { Compiler, } from 'webpack'
 import process from 'process'
 import {
@@ -7,17 +7,11 @@ import {
 } from '@higgins-mmt/core'
 import i18nTransformerLoader from './loader'
 
-type UploadOptions = Omit<UploadConfig, 'appType'> & {
-  appType?: 'FE_VUE2' | 'FE_VUE3'
-}
-
 export class I18nTransformPlugin {
-  generateConfig: GenerateConfig
-  uploadConfig: UploadOptions
+  options: I18nPluginOptions
 
-  constructor(generateConfig: GenerateConfig, uploadConfig: UploadOptions,) {
-    this.generateConfig = generateConfig
-    this.uploadConfig = uploadConfig
+  constructor(options: I18nPluginOptions,) {
+    this.options = options
   }
 
   apply(compiler: Compiler,) {
@@ -26,21 +20,27 @@ export class I18nTransformPlugin {
       process.argv.includes('-w',) ||
       process.argv.includes('serve',)
 
+    const {
+      open = true,
+      generateConfig,
+      uploadConfig,
+    } = this.options
+
     compiler.hooks.afterCompile.tap('I18nTransformerPlugin', () => {
-      if (isWatchMode) {
+      if (isWatchMode || !open) {
         return
       }
-      generate(this.generateConfig,)
+      generate(generateConfig,)
     },)
 
     compiler.hooks.afterEmit.tap('I18nTransformerPlugin', () => {
-      if (isWatchMode || !this.uploadConfig) {
+      if (isWatchMode || !this.options.uploadConfig || !open) {
         return
       }
-      if (!this.uploadConfig.appType) {
-        this.uploadConfig.appType = 'FE_VUE2'
+      if (!uploadConfig.appType) {
+        uploadConfig.appType = 'FE_VUE2'
       }
-      upload(this.uploadConfig as UploadConfig, this.generateConfig,)
+      upload(uploadConfig as UploadConfig, generateConfig,)
     },)
   }
 }

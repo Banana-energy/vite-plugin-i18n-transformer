@@ -3,7 +3,7 @@
   "version": "2.0.6",
   "type": "module",
   "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "engines": {
     "node": ">=14"
@@ -15,11 +15,11 @@
       "require": "./dist/index.cjs"
     },
     "./dist/utils": {
-      "import": "./dist/utils.js",
+      "import": "./dist/utils.mjs",
       "require": "./dist/utils.cjs"
     },
     "./utils": {
-      "import": "./dist/utils.js",
+      "import": "./dist/utils.mjs",
       "require": "./dist/utils.cjs"
     }
   },

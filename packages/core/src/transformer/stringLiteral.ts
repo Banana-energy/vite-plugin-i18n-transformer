@@ -248,7 +248,6 @@ const locators: Record<string, NodeLocator> = {
 
 /**
  * 转换字符串字面量为i18n调用表达式
- * @param transformOptions 转换配置选项
  */
 export function transformStringLiteral({
   path,

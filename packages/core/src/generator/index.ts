@@ -46,7 +46,6 @@ const translationMessages: Messages = {}
  * 设置国际化消息
  * @param {string} key - 消息的唯一标识符
  * @param {string} value - 消息的原文内容
- * @throws {Error} 当 key 或 value 无效时抛出错误
  */
 export function setMessage(key: string, value: string,) {
   translationMessages[key] = value

@@ -8,6 +8,8 @@ export type GenerateKey = (value: string, node: NodePath<StringLiteral>['node'] 
 
 /** 转换器主配置接口 */
 export interface TransformConfig {
+  /** 是否转换 */
+  open?: boolean
   /** 要包含的文件glob模式 */
   include?: string[]
   /** 要排除的文件glob模式 */

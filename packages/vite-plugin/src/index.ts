@@ -1,20 +1,35 @@
-import type { UploadConfig, } from '@higgins-mmt/core'
+import type { I18nPluginOptions, UploadConfig, } from '@higgins-mmt/core'
 import type { Plugin, } from 'vite'
-import type { I18nPluginOptions, } from './types'
-import { generate, transform, upload, } from '@higgins-mmt/core'
+import {
+  generate,
+  transform,
+  upload,
+} from '@higgins-mmt/core'
 import { createFilter, } from 'vite'
 
 export default (options: I18nPluginOptions,): Plugin => {
   let isBuild = false
+  const isOpened = options.open === true
+  const {
+    transformConfig,
+    generateConfig,
+    uploadConfig,
+  } = options
+
   return {
     name: 'i18n-transformer',
     configResolved(resolvedConfig,) {
       isBuild = resolvedConfig.command === 'build'
     },
     transform(code, id,) {
-      const filter = createFilter(options.transformConfig.include, options.transformConfig.exclude,)
-      const isOpened = options.open === true || (options.open === undefined && isBuild)
-      if (!filter(id,) || !isOpened) {
+      if (!transformConfig || !isOpened) {
+        return {
+          code,
+          map: null,
+        }
+      }
+      const filter = createFilter(transformConfig.include, transformConfig.exclude,)
+      if (!filter(id,)) {
         return {
           code,
           map: null,
@@ -28,7 +43,7 @@ export default (options: I18nPluginOptions,): Plugin => {
           id,
           code,
         },
-        options.transformConfig,
+        transformConfig,
       )
       return {
         code: newCode,
@@ -36,19 +51,19 @@ export default (options: I18nPluginOptions,): Plugin => {
       }
     },
     buildEnd() {
-      if (!isBuild) {
+      if (!isBuild || !isOpened) {
         return
       }
-      generate(options.generateConfig,)
+      generate(generateConfig,)
     },
     writeBundle() {
-      if (!isBuild || !options.uploadConfig) {
+      if (!isBuild || !uploadConfig || !isOpened) {
         return
       }
-      if (!options.uploadConfig.appType) {
-        options.uploadConfig.appType = 'FE_VUE3'
+      if (!uploadConfig.appType) {
+        uploadConfig.appType = 'FE_VUE3'
       }
-      upload(options.uploadConfig as UploadConfig, options.generateConfig,)
+      upload(uploadConfig as UploadConfig, generateConfig,)
     },
   }
 }

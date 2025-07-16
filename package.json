@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "pnpm -r clean && pnpm -r build ",
+    "build": "pnpm -r clean && pnpm -r build",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest watch"
