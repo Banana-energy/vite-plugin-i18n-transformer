@@ -1,5 +1,11 @@
 # @higgins-mmt/core
 
+## 2.1.0
+
+### Minor Changes
+
+- 统一 webpack 和 vite 参数
+
 ## 2.0.6
 
 ### Patch Changes

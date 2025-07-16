@@ -1,5 +1,16 @@
 # @higgins-mmt/webpack-plugin-i18n-transformer
 
+## 2.1.0
+
+### Minor Changes
+
+- 统一 webpack 和 vite 参数
+
+### Patch Changes
+
+- Updated dependencies
+  - @higgins-mmt/core@2.1.0
+
 ## 2.0.6
 
 ### Patch Changes
