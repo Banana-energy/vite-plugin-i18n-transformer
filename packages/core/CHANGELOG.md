@@ -1,5 +1,11 @@
 # @higgins-mmt/core
 
+## 2.1.2
+
+### Patch Changes
+
+- 使用 babel path.replaceWith 替代原本字符串替换方法
+
 ## 2.1.1
 
 ### Patch Changes
