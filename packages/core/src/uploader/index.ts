@@ -150,9 +150,11 @@ export async function upload(uploadConfig: UploadConfig, generateConfig: Generat
     }
   }
 
-  uploadParams.langList = loadOutputFiles(generateConfig,)
-  uploadParams.codeSource = 'FE_GENERATE_UPLOAD'
-  const [ error, result, ] = await to(axios.post<UploadResponse>(url, uploadParams,),)
+  const [ error, result, ] = await to(axios.post<UploadResponse>(url, {
+    ...uploadParams,
+    codeSource: 'FE_GENERATE_UPLOAD',
+    langList: loadOutputFiles(generateConfig,),
+  },),)
   if (result?.data.success && error === null) {
     log.info(`Upload successful.`,)
   } else {

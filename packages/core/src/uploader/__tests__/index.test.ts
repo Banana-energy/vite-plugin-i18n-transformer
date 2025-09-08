@@ -334,22 +334,19 @@ describe('uploader', () => {
       vi.mocked(mockedReadFileSync,).mockReturnValue(Buffer.from(JSON.stringify(enContent,),),)
 
       await upload(mockUploadConfig, mockGenerateConfig,)
-
-      expect(vi.mocked(mockedAxios.post,),).toHaveBeenCalledWith(
-        'http://test.com',
-        {
-          app: 'test-app',
-          appType: 'FE_VUE3',
-          codeSource: 'FE_SCAN_UPLOAD',
-          strategy: 'INSERT_ONLY',
-          langList: [
-            {
-              locale: 'en',
-              json: enContent,
-            },
-          ],
-        },
-      )
+      expect(vi.mocked(mockedAxios.post,),).toHaveBeenCalledTimes(2,)
+      expect(vi.mocked(mockedAxios.post,),).toHaveBeenNthCalledWith(1, 'http://test.com', {
+        app: 'test-app',
+        appType: 'FE_VUE3',
+        codeSource: 'FE_SCAN_UPLOAD',
+        strategy: 'INSERT_ONLY',
+        langList: [
+          {
+            locale: 'en',
+            json: enContent,
+          },
+        ],
+      },)
       expect(vi.mocked(mockedLog.info,),).toHaveBeenCalledWith('Upload successful.',)
     },)
 
@@ -390,7 +387,7 @@ describe('uploader', () => {
         {
           app: 'test-app',
           appType: 'FE_VUE3',
-          codeSource: 'FE_SCAN_UPLOAD',
+          codeSource: 'FE_GENERATE_UPLOAD',
           strategy: 'INSERT_ONLY',
           langList: [
             {
