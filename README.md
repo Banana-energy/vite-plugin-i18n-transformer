@@ -1,4 +1,5 @@
 # i18n-transformer
+
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Banana-energy/i18n-transformer)
 
 一个自动化的国际化转换工具，支持 Vite 和 Webpack 插件形式使用。
@@ -21,26 +22,26 @@
 
 ```bash
 # pnpm
-pnpm add -D @higgins-mmt/vite-plugin
+pnpm add -D @higgins-mmt/vite-plugin-i18n-transformer
 
 # npm
-npm install -D @higgins-mmt/vite-plugin
+npm install -D @higgins-mmt/vite-plugin-i18n-transformer
 
 # yarn
-yarn add -D @higgins-mmt/vite-plugin
+yarn add -D @higgins-mmt/vite-plugin-i18n-transformer
 ```
 
 ### Webpack 插件
 
 ```bash
 # pnpm
-pnpm add -D @higgins-mmt/webpack-plugin
+pnpm add -D @higgins-mmt/webpack-plugin-i18n-transformer
 
 # npm
-npm install -D @higgins-mmt/webpack-plugin
+npm install -D @higgins-mmt/webpack-plugin-i18n-transformer
 
 # yarn
-yarn add -D @higgins-mmt/webpack-plugin
+yarn add -D @higgins-mmt/webpack-plugin-i18n-transformer
 ```
 
 ## 使用指南
@@ -49,24 +50,40 @@ yarn add -D @higgins-mmt/webpack-plugin
 
 ```typescript
 // vite.config.ts
-import { defineConfig } from 'vite'
-import { i18nTransformer } from '@higgins-mmt/vite-plugin'
+import {defineConfig} from 'vite'
+import {i18nTransformer} from '@higgins-mmt/vite-plugin'
 
 export default defineConfig({
   plugins: [
-    i18nTransformer({
-      // 配置选项
-      include: ['src/**/*.{js,jsx,ts,tsx}'],
-      exclude: ['node_modules/**'],
-      i18nCallee: 't',
-      // 翻译平台配置（可选）
-      upload: {
-        app: 'your-app-name',
-        url: 'your-translation-platform-url',
-        appType: 'FE_VUE3',
-        uploadStrategy: 'INSERT_ONLY'
-      }
-    })
+    I18nTransformer({
+      open: false,
+      transformConfig: {
+        include: ['**.js', '**.jsx', '**.ts', '**.tsx', '**.vue'],
+        exclude: ['node_modules/**', 'src/lang/**'],
+        i18nCallee: 'i18n.get',
+        dependency: {
+          name: 'i18n',
+          path: '@/lang',
+          module: 'esm',
+          objectPattern: true,
+        },
+      },
+      generateConfig: {
+        filename: 'zh-CN.json',
+        langList: ['en-US.json'],
+        path: resolve('public/static/locales'),
+      },
+      uploadConfig: {
+        app: env.VITE_I18N_APP,
+        uploadStrategy: 'INSERT_UPDATE',
+        localePath: resolve('src/lang/translations'),
+        localeConfig: {
+          'en_US': ['en_US.json'],
+          'zh_CN': ['zh_CN.json'],
+        },
+        url: env.VITE_I18N_URL + env.VITE_I18N_UPLOAD_URL,
+      },
+    }),
   ]
 })
 ```
@@ -75,24 +92,28 @@ export default defineConfig({
 
 ```typescript
 // webpack.config.js
-const { I18nTransformerPlugin } = require('@higgins-mmt/webpack-plugin')
+const {I18nTransformerPlugin} = require('@higgins-mmt/webpack-plugin')
 
 module.exports = {
   // ...其他配置
   plugins: [
-    new I18nTransformerPlugin({
-      // 配置选项
-      include: ['src/**/*.{js,jsx,ts,tsx}'],
-      exclude: ['node_modules/**'],
-      i18nCallee: 't',
-      // 翻译平台配置（可选）
-      upload: {
-        app: 'your-app-name',
-        url: 'your-translation-platform-url',
-        appType: 'FE_VUE3',
-        uploadStrategy: 'INSERT_ONLY'
-      }
-    })
+    new I18nTransformPlugin({
+      uploadConfig: {
+        url: uploadUrl,
+        app: process.env.VUE_APP_I18N_APP,
+        localePath: resolve('src/lang'),
+        localeConfig: {
+          en: ['en.json'],
+          zh: ['zh.json'],
+        },
+        uploadStrategy: 'INSERT_UPDATE',
+      },
+      generateConfig: {
+        filename: 'zh.json',
+        langList: ['en.json'],
+        path: resolve('public/static/locales'),
+      },
+    }),
   ]
 }
 ```
@@ -101,34 +122,34 @@ module.exports = {
 
 ### 转换器配置
 
-| 选项 | 类型 | 默认值 | 描述 |
-|------|------|--------|------|
-| include | string[] | - | 需要处理的文件匹配模式 |
-| exclude | string[] | - | 需要排除的文件匹配模式 |
-| i18nCallee | string | '' | i18n 函数名，如 't' 或 'i18n' |
-| localePattern | RegExp | /[\u4E00-\u9FA5]+/ | 匹配需要转换文本的正则，默认匹配中文字符 |
-| generateKey | (text: string, node: Node, messages: Messages) => string | - | 自定义生成 key 的函数 |
-| dependency | DependencyConfig | - | i18n 库的导入配置 |
+| 选项            | 类型                                                       | 默认值                | 描述                      |
+|---------------|----------------------------------------------------------|--------------------|-------------------------|
+| include       | string[]                                                 | -                  | 需要处理的文件匹配模式             |
+| exclude       | string[]                                                 | -                  | 需要排除的文件匹配模式             |
+| i18nCallee    | string                                                   | ''                 | i18n 函数名，如 't' 或 'i18n' |
+| localePattern | RegExp                                                   | /[\u4E00-\u9FA5]+/ | 匹配需要转换文本的正则，默认匹配中文字符    |
+| generateKey   | (text: string, node: Node, messages: Messages) => string | -                  | 自定义生成 key 的函数           |
+| dependency    | DependencyConfig                                         | -                  | i18n 库的导入配置             |
 
 #### dependency 配置
 
-| 选项 | 类型 | 默认值 | 描述                            |
-|------|------|--------|-------------------------------|
-| path | string | - | i18n 库的路径，如 '@/hooks/useI18n' |
-| name | string | - | 导入的变量名                        |
-| module | 'commonjs' \| 'esm' | - | 模块系统类型                        |
-| objectPattern | boolean | - | 是否使用解构导入                      |
+| 选项            | 类型                  | 默认值 | 描述                            |
+|---------------|---------------------|-----|-------------------------------|
+| path          | string              | -   | i18n 库的路径，如 '@/hooks/useI18n' |
+| name          | string              | -   | 导入的变量名                        |
+| module        | 'commonjs' \| 'esm' | -   | 模块系统类型                        |
+| objectPattern | boolean             | -   | 是否使用解构导入                      |
 
 ### 翻译平台配置
 
-| 选项 | 类型 | 默认值 | 描述 |
-|------|------|--------|------|
-| app | string | - | 应用标识，每个应用唯一 |
-| url | string | - | 翻译平台 API 地址 |
-| appType | 'FE_VUE2' \| 'FE_VUE3' | - | 应用类型 |
-| uploadStrategy | 'INSERT_ONLY' \| 'INSERT_UPDATE' \| 'INSERT_CLEAN' \| 'UPSERT_CLEAN' | - | 上传策略 |
-| localePath | string | - | 本地语言文件路径 |
-| localeConfig | Record<string, string[]> | - | 本地语言文件配置 |
+| 选项             | 类型                                                                   | 默认值 | 描述          |
+|----------------|----------------------------------------------------------------------|-----|-------------|
+| app            | string                                                               | -   | 应用标识，每个应用唯一 |
+| url            | string                                                               | -   | 翻译平台 API 地址 |
+| appType        | 'FE_VUE2' \| 'FE_VUE3'                                               | -   | 应用类型        |
+| uploadStrategy | 'INSERT_ONLY' \| 'INSERT_UPDATE' \| 'INSERT_CLEAN' \| 'UPSERT_CLEAN' | -   | 上传策略        |
+| localePath     | string                                                               | -   | 本地语言文件路径    |
+| localeConfig   | Record<string, string[]>                                             | -   | 本地语言文件配置    |
 
 #### 上传策略说明
 
@@ -144,7 +165,7 @@ module.exports = {
 如果某些文本不需要进行国际化转换，可以使用 `ignoreAutoI18n` 标记：
 
 ```typescript
-import { ignoreAutoI18n } from '@higgins-mmt/core'
+import {ignoreAutoI18n} from '@higgins-mmt/core'
 
 // 使用函数标记
 const text = ignoreAutoI18n('不需要转换的文本')
@@ -155,7 +176,7 @@ const text = ignoreAutoI18n('不需要转换的文本')
 你可以通过配置自定义转换规则：
 
 ```typescript
-{
+const config = {
   // 自定义生成 key 的函数
   generateKey: (text: string, node: Node, messages: Messages) => {
     return `custom.${text}`
@@ -163,7 +184,7 @@ const text = ignoreAutoI18n('不需要转换的文本')
   // 自定义匹配模式（例如匹配所有文本）
   localePattern: /.+/,
   // 自定义转换函数名
-  i18nCallee: 't'
+  i18nCallee: "t",
 }
 ```
 
@@ -178,7 +199,7 @@ const text = ignoreAutoI18n('不需要转换的文本')
 const text = `Hello, ${name}`
 
 // 转换后
-const text = t('hello_name', { name })
+const text = t('hello_name', {name})
 ```
 
 ### 2. 如何处理 HTML/JSX 中的文本？
@@ -198,22 +219,26 @@ const text = t('hello_name', { name })
 ### 开发环境设置
 
 1. 克隆仓库
+
 ```bash
 git clone https://github.com/your-username/i18n-transformer.git
 cd i18n-transformer
 ```
 
 2. 安装依赖
+
 ```bash
 pnpm install
 ```
 
 3. 构建项目
+
 ```bash
 pnpm build
 ```
 
 4. 运行测试
+
 ```bash
 pnpm test
 ```
